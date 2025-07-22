@@ -23,9 +23,12 @@ phases:
       # Generate a short Docker image tag using GitHub commit SHA (7 characters)
       - IMAGE_TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)"
       - export IMAGE_TAG
+      - IMAGE_URI="$ECR_REGISTRY/$REPOSITORY_NAME"
+      - export IMAGE_URI
       # Authenticate Docker with ECR using AWS CLI
       - echo "Logging into Amazon ECR at $IMAGE_URI..."
-      - aws ecr get-login-password | docker login --username AWS --password-stdin $IMAGE_URI
+      # - aws ecr get-login-password | docker login --username AWS --password-stdin $IMAGE_URI
+      - aws ecr get-login-password --region ap-southeast-7 | docker login --username AWS --password-stdin $IMAGE_URI
 
   build:
     commands:
