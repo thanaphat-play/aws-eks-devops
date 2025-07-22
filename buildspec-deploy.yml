@@ -9,6 +9,7 @@ env:
     EKS_CLUSTER_NAME: "dev-tsfc-eks"
     # IAM Role ARN used to assume access to EKS for kubectl
     EKS_KUBECTL_ROLE_ARN: "arn:aws:iam::869546918087:role/EksCodeBuildKubectlRole"
+    EKS_CLUSTER_REGION: "ap-southeast-7"
 
 phases:
   install:
@@ -44,7 +45,7 @@ phases:
       - export AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.Credentials.SessionToken')
       # Setup kubeconfig to interact with the EKS cluster
       - echo "Updating kubeconfig with EKS cluster credentials..."
-      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $EKS_CLUSTER_REGION
       # Deploy application manifests to EKS
       - echo "Applying Kubernetes manifests..."
       - kubectl apply -f kube-manifests/
