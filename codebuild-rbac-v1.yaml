@@ -1,0 +1,52 @@
+# Limited RBAC for CodeBuild deployment
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: codebuild-deploy-role # match roleRef.name on ClusterRoleBinding
+rules:
+# Minimal permissions for deployment
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["services", "pods"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+# Only allow operations in specific namespaces (optional)
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: codebuild-deploy-binding # define anything
+subjects:
+- kind: User
+  name: arn:aws:sts::869546918087:assumed-role/EksCodeBuildKubectlRole/codebuild-kubectl # Changed to match access entry username (if using entry access use username)
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: codebuild-deploy-role # match metadata.name on ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  
+# kubectl apply -f codebuild-rbac-v1.yaml
+# kubectl get clusterrole codebuild-deploy-role
+# kubectl describe clusterrole codebuild-deploy-role
+# kubectl get clusterrolebinding codebuild-deploy-binding
+# kubectl describe clusterrolebinding codebuild-deploy-binding
+# kubectl get clusterroles | grep codebuild
+
+# Test permissions (if you can assume the role):
+# kubectl auth can-i get pods --as=arn:aws:sts::869546918087:assumed-role/EksCodeBuildKubectlRole/codebuild-kubectl
+# kubectl auth can-i create deployments --as=arn:aws:sts::869546918087:assumed-role/EksCodeBuildKubectlRole/codebuild-kubectl
+
+# kubectl delete -f codebuild-rbac-v1.yaml
+# kubectl delete clusterrolebinding codebuild-deploy-binding
+# kubectl delete clusterrole codebuild-deploy-role
