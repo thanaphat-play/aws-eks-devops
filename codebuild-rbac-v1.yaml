@@ -29,7 +29,7 @@ metadata:
   name: codebuild-deploy-binding # define anything
 subjects:
 - kind: User
-  name: arn:aws:sts::869546918087:assumed-role/EksCodeBuildKubectlRole/codebuild-kubectl # Changed to match access entry username (if using entry access use username)
+  name: arn:aws:sts::869546918087:assumed-role/EksCodeBuildKubectlRole/codebuild-kubectl # match access entry username (if using entry access use username)
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
